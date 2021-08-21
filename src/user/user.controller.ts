@@ -12,7 +12,7 @@ export class UserController {
   ) {}
 
   @Post()
-  @ApiOperation({summary: 'Save Data User'})
+  @ApiOperation({summary: 'Create Data User'})
   @ApiOkResponse({description: 'Sukses'})
   @ApiInternalServerErrorResponse({description: 'Terjadi kesalahan dari server'})
   @ApiBadRequestResponse({ description: 'Data yang dimasukan tidak sesuai'})

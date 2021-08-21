@@ -29,7 +29,7 @@ export class CreateUserDto {
   readonly email: string;
 
   @ApiProperty({type: String, default: 'passwordaku'})
-  readonly password: string;
+  password: string;
 
   @ApiProperty({type: String, default: ''})
   readonly no_rekening: string;
