@@ -32,20 +32,20 @@ export class RoleService {
   async update(id: number, data: CreateRoleDto) {
     const cekId = await this.findOne(id)
     if(cekId.length !== 0) {
-      const updateRoleById = await this.roleRepository.update({id}, data)
-      return 'data sukses diupdate'
+      await this.roleRepository.update({id}, data)
+      return {message: 'data sukses diupdate'}
     } else {
-      return 'data gagal diupdate'
+      return {message: 'data gagal diupdate'}
     }
   }
 
   async remove(id: number) {
     const cekId = await this.findOne(id)
     if(cekId.length !== 0) {
-      const deleteRoleById = await this.roleRepository.delete({id})
-      return 'data sukses dihapus'
+      await this.roleRepository.delete({id})
+      return {message: 'data sukses dihapus'}
     } else {
-      return 'data id tidak ditemukan'
+      return {message:'data role tidak ditemukan'}
     }
   }
 }

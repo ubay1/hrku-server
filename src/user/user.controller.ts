@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Put } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -34,23 +34,44 @@ export class UserController {
   async findAll() {
     const user = await this.userService.findAll();
     return {
-      message: 'sukses mendpatkan data semua user',
+      message: 'sukses mendapatkan data semua user',
       data: user
     };
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.userService.findOne(+id);
+  @ApiOperation({summary: 'Get User By ID'})
+  @ApiOkResponse({description: 'Sukses'})
+  @ApiInternalServerErrorResponse({description: 'Terjadi kesalahan dari server'})
+  @ApiBadRequestResponse({ description: 'Data yang dimasukan tidak sesuai'})
+  @ApiForbiddenResponse({ description: 'Gagal'})
+  async findOne(@Param('id') id: number) {
+    const user = await this.userService.findOne(id);
+    return {
+      message: 'sukses mendapatkan data user',
+      data: user
+    };
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.userService.update(+id, updateUserDto);
+  @Put(':id')
+  @ApiOperation({summary: 'Update User By ID'})
+  @ApiOkResponse({description: 'Sukses'})
+  @ApiInternalServerErrorResponse({description: 'Terjadi kesalahan dari server'})
+  @ApiBadRequestResponse({ description: 'Data yang dimasukan tidak sesuai'})
+  @ApiForbiddenResponse({ description: 'Gagal'})
+  update(@Param('id') id: number, @Body() updateUserDto: UpdateUserDto) {
+    const role = this.userService.update(id, updateUserDto);
+    return role;
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.userService.remove(+id);
+  @ApiOperation({summary: 'Delete User By ID'})
+  @ApiOkResponse({description: 'Sukses'})
+  @ApiInternalServerErrorResponse({description: 'Terjadi kesalahan dari server'})
+  @ApiBadRequestResponse({ description: 'Data yang dimasukan tidak sesuai'})
+  @ApiForbiddenResponse({ description: 'Gagal'})
+  async remove(@Param('id') id: number) {
+    const user = await this.userService.remove(id);
+    return user;
   }
 }

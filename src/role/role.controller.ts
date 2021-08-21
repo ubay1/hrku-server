@@ -60,9 +60,7 @@ export class RoleController {
   @ApiForbiddenResponse({ description: 'Gagal'})
   async update(@Param('id') id: number, @Body() updateRoleDto: CreateRoleDto) {
     const role = this.roleService.update(id, updateRoleDto);
-    return {
-      message: role,
-    };
+    return role;
   }
 
   @Delete(':id')
@@ -73,9 +71,6 @@ export class RoleController {
   @ApiForbiddenResponse({ description: 'Gagal'})
   async remove(@Param('id') id: number) {
     const role = await this.roleService.remove(id);
-    // console.log(role)
-    return {
-      message: role,
-    };
+    return role;
   }
 }
