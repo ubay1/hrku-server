@@ -20,9 +20,9 @@ export class CreateRoleDto {
   @ApiProperty({type: String, default: 'ceo'})
   readonly slug_role_name: string;
 
-  @ApiProperty({type: String, default: datenow})
-  readonly created_at: string;
+  // @ApiProperty({type: String, default: datenow})
+  // readonly created_at: string;
 
-  @ApiProperty({type: String, default: datenow})
-  readonly updated_at: string;
+  // @ApiProperty({type: String, default: datenow})
+  // readonly updated_at: string;
 }

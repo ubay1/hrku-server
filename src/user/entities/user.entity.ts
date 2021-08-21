@@ -11,8 +11,11 @@ export class User {
       cascade: true,
       eager: true,
     })
-    @JoinColumn()
+    @JoinColumn({name: 'roleId'})
     public role: Role;
+
+    @Column()
+    public roleId: number;
 
     @Column()
     fullname: string;
@@ -29,9 +32,9 @@ export class User {
     @Column({nullable: true})
     no_bpjs: string;
 
-    @Column({type: 'timestamptz'})
+    @Column({type: 'timestamptz',default: () => 'CURRENT_TIMESTAMP'})
     created_at: string
 
-    @Column({type: 'timestamptz'})
+    @Column({type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP', onUpdate: 'CURRENT_TIMESTAMP'})
     updated_at: string
 }

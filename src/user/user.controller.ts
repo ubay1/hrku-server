@@ -2,19 +2,41 @@ import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/commo
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { ApiBadRequestResponse, ApiForbiddenResponse, ApiInternalServerErrorResponse, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 
+@ApiTags('UserController')
 @Controller('user')
 export class UserController {
-  constructor(private readonly userService: UserService) {}
+  constructor(
+    private readonly userService: UserService
+  ) {}
 
   @Post()
-  create(@Body() createUserDto: CreateUserDto) {
-    return this.userService.create(createUserDto);
+  @ApiOperation({summary: 'Save Data User'})
+  @ApiOkResponse({description: 'Sukses'})
+  @ApiInternalServerErrorResponse({description: 'Terjadi kesalahan dari server'})
+  @ApiBadRequestResponse({ description: 'Data yang dimasukan tidak sesuai'})
+  @ApiForbiddenResponse({ description: 'Gagal'})
+  async create(@Body() data: CreateUserDto) {
+    const user = await  this.userService.create(data);
+    return {
+      message: 'sukses membuat user',
+      data: user
+    }
   }
 
   @Get()
-  findAll() {
-    return this.userService.findAll();
+  @ApiOperation({summary: 'Get All User'})
+  @ApiOkResponse({description: 'Sukses'})
+  @ApiInternalServerErrorResponse({description: 'Terjadi kesalahan dari server'})
+  @ApiBadRequestResponse({ description: 'Data yang dimasukan tidak sesuai'})
+  @ApiForbiddenResponse({ description: 'Gagal'})
+  async findAll() {
+    const user = await this.userService.findAll();
+    return {
+      message: 'sukses mendpatkan data semua user',
+      data: user
+    };
   }
 
   @Get(':id')

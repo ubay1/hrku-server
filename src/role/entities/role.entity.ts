@@ -12,9 +12,9 @@ export class Role {
     @Column()
     slug_role_name: string;
 
-    @Column({type: 'timestamptz'})
+    @Column({type: 'timestamptz',default: () => 'CURRENT_TIMESTAMP'})
     created_at: string
 
-    @Column({type: 'timestamptz'})
+    @Column({type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP', onUpdate: 'CURRENT_TIMESTAMP'})
     updated_at: string
 }
