@@ -1,7 +1,8 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, HttpStatus, Put } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, HttpStatus, Put, UseGuards } from '@nestjs/common';
 import { RoleService } from './role.service';
 import { CreateRoleDto } from './dto/create-role.dto';
-import { ApiBadRequestResponse, ApiCreatedResponse, ApiForbiddenResponse, ApiInternalServerErrorResponse, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiBadRequestResponse, ApiBearerAuth, ApiCreatedResponse, ApiForbiddenResponse, ApiInternalServerErrorResponse, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { JwtAuthGuard } from 'src/auth/guard/jwt-auth.guard';
 
 @ApiTags('RoleController')
 @Controller('role')
@@ -10,7 +11,9 @@ export class RoleController {
     private readonly roleService: RoleService
   ) {}
 
+  @UseGuards(JwtAuthGuard)
   @Post()
+  @ApiBearerAuth('access-token')
   @ApiOperation({summary: 'Create New Role'})
   @ApiCreatedResponse({description: 'Sukses'})
   @ApiInternalServerErrorResponse({description: 'Terjadi kesalahan dari server'})
@@ -52,7 +55,9 @@ export class RoleController {
     };
   }
 
+  @UseGuards(JwtAuthGuard)
   @Put(':id')
+  @ApiBearerAuth('access-token')
   @ApiOperation({summary: 'Update Role By ID'})
   @ApiOkResponse({description: 'Sukses'})
   @ApiInternalServerErrorResponse({description: 'Terjadi kesalahan dari server'})
@@ -63,7 +68,9 @@ export class RoleController {
     return role;
   }
 
+  @UseGuards(JwtAuthGuard)
   @Delete(':id')
+  @ApiBearerAuth('access-token')
   @ApiOperation({summary: 'Delete Role By ID'})
   @ApiOkResponse({description: 'Sukses'})
   @ApiInternalServerErrorResponse({description: 'Terjadi kesalahan dari server'})

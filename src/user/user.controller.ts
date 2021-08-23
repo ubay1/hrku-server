@@ -1,31 +1,55 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Put } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Put, Res, HttpStatus, UseGuards, HttpException, Req, Request } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { ApiBadRequestResponse, ApiForbiddenResponse, ApiInternalServerErrorResponse, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiBadRequestResponse, ApiBearerAuth, ApiCreatedResponse, ApiForbiddenResponse, ApiInternalServerErrorResponse, ApiOkResponse, ApiOperation, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
+import { LoginUserDto } from './dto/login-user.dto';
+import * as bcrypt from 'bcrypt';
+import { AuthService } from 'src/auth/auth.service';
+import { LocalAuthGuard } from 'src/auth/guard/local-auth.guard';
+import { AuthLoginUserDto } from 'src/auth/dto/auth-login-user.dto';
+import { JwtAuthGuard } from 'src/auth/guard/jwt-auth.guard';
 
 @ApiTags('UserController')
 @Controller('user')
 export class UserController {
   constructor(
-    private readonly userService: UserService
+    private readonly userService: UserService,
+    private readonly authService: AuthService
   ) {}
 
+  @UseGuards(JwtAuthGuard)
   @Post()
+  @ApiBearerAuth('access-token')
   @ApiOperation({summary: 'Create Data User'})
-  @ApiOkResponse({description: 'Sukses'})
+  @ApiCreatedResponse({description: 'Sukses'})
   @ApiInternalServerErrorResponse({description: 'Terjadi kesalahan dari server'})
   @ApiBadRequestResponse({ description: 'Data yang dimasukan tidak sesuai'})
   @ApiForbiddenResponse({ description: 'Gagal'})
-  async create(@Body() data: CreateUserDto) {
+  async create(@Body() data: CreateUserDto, @Res() res: any) {
     const user = await  this.userService.create(data);
-    return {
-      message: 'sukses membuat user',
-      data: user
+    if (typeof(user.data) === 'undefined') {
+      return res.status(HttpStatus.FORBIDDEN).json(user);
+    } else {
+      return res.status(HttpStatus.CREATED).json(user)
     }
   }
 
+  @UseGuards(LocalAuthGuard)
+  @Post('/login')
+  @ApiOperation({summary: 'Login User'})
+  @ApiOkResponse({description: 'Sukses'})
+  @ApiUnauthorizedResponse({description: 'Unauthorized'})
+  @ApiInternalServerErrorResponse({description: 'Terjadi kesalahan dari server'})
+  @ApiBadRequestResponse({ description: 'Data yang dimasukan tidak sesuai'})
+  @ApiForbiddenResponse({ description: 'Gagal'})
+  async login(@Request() req: any, @Body() dataUser: AuthLoginUserDto) {
+    return this.authService.userLogin(req.user)
+  }
+
+  @UseGuards(JwtAuthGuard)
   @Get()
+  @ApiBearerAuth('access-token')
   @ApiOperation({summary: 'Get All User'})
   @ApiOkResponse({description: 'Sukses'})
   @ApiInternalServerErrorResponse({description: 'Terjadi kesalahan dari server'})
@@ -39,7 +63,9 @@ export class UserController {
     };
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get(':id')
+  @ApiBearerAuth('access-token')
   @ApiOperation({summary: 'Get User By ID'})
   @ApiOkResponse({description: 'Sukses'})
   @ApiInternalServerErrorResponse({description: 'Terjadi kesalahan dari server'})
@@ -53,7 +79,9 @@ export class UserController {
     };
   }
 
+  @UseGuards(JwtAuthGuard)
   @Put(':id')
+  @ApiBearerAuth('access-token')
   @ApiOperation({summary: 'Update User By ID'})
   @ApiOkResponse({description: 'Sukses'})
   @ApiInternalServerErrorResponse({description: 'Terjadi kesalahan dari server'})
@@ -64,7 +92,9 @@ export class UserController {
     return role;
   }
 
+  @UseGuards(JwtAuthGuard)
   @Delete(':id')
+  @ApiBearerAuth('access-token')
   @ApiOperation({summary: 'Delete User By ID'})
   @ApiOkResponse({description: 'Sukses'})
   @ApiInternalServerErrorResponse({description: 'Terjadi kesalahan dari server'})
