@@ -112,7 +112,7 @@ export class UserService {
 
   async getProfil(token: any) {
     const decoded: any = this.decodeToken(token)
-    console.log(decoded.email)
+    // console.log(decoded.email)
     const user = await this.userRepository.createQueryBuilder('user')
     .where("user.email = :email",{email: decoded.email})
     .leftJoinAndSelect("user.role", "role")
