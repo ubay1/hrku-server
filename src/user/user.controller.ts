@@ -64,6 +64,23 @@ export class UserController {
   }
 
   @UseGuards(JwtAuthGuard)
+  @Get('/profil')
+  @ApiBearerAuth('access-token')
+  @ApiOperation({summary: 'Get Profil Auth'})
+  @ApiOkResponse({description: 'Sukses'})
+  @ApiInternalServerErrorResponse({description: 'Terjadi kesalahan dari server'})
+  @ApiBadRequestResponse({ description: 'Data yang dimasukan tidak sesuai'})
+  @ApiForbiddenResponse({ description: 'Gagal'})
+  async getProfil(@Request() req: any,) {
+    const token = req.headers.authorization.replace('Bearer ', '')
+    const user = await this.userService.getProfil(token);
+    return {
+      message: 'sukses mendapatkan data semua user',
+      data: user
+    };
+  }
+
+  @UseGuards(JwtAuthGuard)
   @Get(':id')
   @ApiBearerAuth('access-token')
   @ApiOperation({summary: 'Get User By ID'})

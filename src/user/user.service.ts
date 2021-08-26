@@ -7,6 +7,9 @@ import { User } from './entities/user.entity';
 import * as bcrypt from 'bcrypt';
 import { LoginUserDto } from './dto/login-user.dto';
 import { Role } from 'src/role/entities/role.entity';
+import * as jwt from 'jsonwebtoken';
+import { jwtConstants } from 'src/auth/constants/constant';
+import { decode } from 'punycode';
 
 @Injectable()
 export class UserService {
@@ -14,6 +17,10 @@ export class UserService {
     @InjectRepository(User) private userRepository: Repository<User>,
     @InjectRepository(Role) private roleRepository: Repository<Role>
   ) {}
+
+  decodeToken(token) {
+    return jwt.verify(token, jwtConstants.secret);
+  }
 
   async findByEmail(email: string): Promise<any> {
     const user = await this.userRepository.findOne({where: {email: email}})
@@ -101,6 +108,17 @@ export class UserService {
     .select(['user', 'role.role_name', 'role.slug_role_name'])
     .getMany();
     return allUser;
+  }
+
+  async getProfil(token: any) {
+    const decoded: any = this.decodeToken(token)
+    console.log(decoded.email)
+    const user = await this.userRepository.createQueryBuilder('user')
+    .where("user.email = :email",{email: decoded.email})
+    .leftJoinAndSelect("user.role", "role")
+    .select(['user', 'role.role_name', 'role.slug_role_name'])
+    .getMany();
+    return user;
   }
 
   async findOne(id: number) {
