@@ -73,7 +73,8 @@ export class UserController {
   @ApiForbiddenResponse({ description: 'Gagal'})
   async getProfil(@Request() req: any,) {
     const token = req.headers.authorization.replace('Bearer ', '')
-    const user = await this.userService.getProfil(token);
+    const decodedToken = this.authService.decodeToken(token)
+    const user = await this.userService.getProfil(decodedToken);
     return {
       message: 'sukses mendapatkan data semua user',
       data: user

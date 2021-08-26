@@ -15,7 +15,7 @@ import { decode } from 'punycode';
 export class UserService {
   constructor(
     @InjectRepository(User) private userRepository: Repository<User>,
-    @InjectRepository(Role) private roleRepository: Repository<Role>
+    @InjectRepository(Role) private roleRepository: Repository<Role>,
   ) {}
 
   decodeToken(token) {
@@ -110,11 +110,11 @@ export class UserService {
     return allUser;
   }
 
-  async getProfil(token: any) {
-    const decoded: any = this.decodeToken(token)
-    // console.log(decoded.email)
+  async getProfil(data: any) {
+    const token = await data;
+    // console.log(token)
     const user = await this.userRepository.createQueryBuilder('user')
-    .where("user.email = :email",{email: decoded.email})
+    .where("user.email = :email",{email: token.email})
     .leftJoinAndSelect("user.role", "role")
     .select(['user', 'role.role_name', 'role.slug_role_name'])
     .getMany();

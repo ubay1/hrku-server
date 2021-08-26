@@ -2,13 +2,14 @@ import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UserService } from '../user/user.service';
 import * as bcrypt from 'bcrypt';
+import { jwtConstants } from './constants/constant';
 
 @Injectable()
 export class AuthService {
   constructor( 
     // depedency injection
     private userService: UserService,
-    private jwtService: JwtService
+    private jwtService: JwtService,
   ){}
 
   async validateUser(email: string, password: string): Promise<any> {
@@ -31,5 +32,9 @@ export class AuthService {
     return {
       access_token: this.jwtService.sign(payload),
     };
+  }
+
+  async decodeToken(token: any) {
+    return this.jwtService.verify(token, jwtConstants.secret);
   }
 }
