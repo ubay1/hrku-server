@@ -18,10 +18,6 @@ export class UserService {
     @InjectRepository(Role) private roleRepository: Repository<Role>,
   ) {}
 
-  decodeToken(token) {
-    return jwt.verify(token, jwtConstants.secret);
-  }
-
   async findByEmail(email: string): Promise<any> {
     const user = await this.userRepository.findOne({where: {email: email}})
     return user;
@@ -68,40 +64,6 @@ export class UserService {
     }
   }
 
-  async login(data: LoginUserDto) {
-    try {
-      const dataUser = await this.userRepository.findOne({where: {email: data.email}})
-      if (dataUser === undefined) {
-        return {
-          message: 'user tidak terdaftar',
-        }
-      }
-      
-      const isPasswordMatching = await bcrypt.compare(data.password, dataUser.password)
-      if (!isPasswordMatching){
-        return {
-          message: 'password tidak sesuai',
-        }
-      }
-
-      // const hashedPassword = await bcrypt.hash(data.password, 10);
-      // console.log(hashedPassword)
-      // const user = await this.userRepository.create({
-      //   ...data,
-      //   password: hashedPassword
-      // });
-      // await this.userRepository.save(user)
-      // user.password = undefined;
-      return {
-        message: 'berhasil login',
-        data: dataUser
-      }
-
-    } catch (error) {
-      console.log(error)
-    }
-  }
-
   async findAll() {
     const allUser = await this.userRepository.createQueryBuilder('user')
     .leftJoinAndSelect("user.role", "role")
@@ -116,8 +78,8 @@ export class UserService {
     const user = await this.userRepository.createQueryBuilder('user')
     .where("user.email = :email",{email: token.email})
     .leftJoinAndSelect("user.role", "role")
-    .select(['user', 'role.role_name', 'role.slug_role_name'])
-    .getMany();
+    .select(['user.fullname', 'user.address', 'user.phone', 'user.foto', 'user.gender', 'user.email', 'role.role_name', 'role.slug_role_name'])
+    .getOne();
     return user;
   }
 

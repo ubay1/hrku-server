@@ -31,6 +31,10 @@ export class User {
     no_rekening: string;
     @Column({nullable: true})
     no_bpjs: string;
+    @Column({nullable: true})
+    foto: string;
+    @Column({length: 1, nullable: true, type: 'char'})
+    gender: string;
 
     @Column({type: 'timestamptz',default: () => 'CURRENT_TIMESTAMP'})
     created_at: string

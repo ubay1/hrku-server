@@ -38,7 +38,7 @@ export class UserController {
   @UseGuards(LocalAuthGuard)
   @Post('/login')
   @ApiOperation({summary: 'Login User'})
-  @ApiOkResponse({description: 'Sukses'})
+  @ApiCreatedResponse({description: 'Sukses'})
   @ApiUnauthorizedResponse({description: 'Unauthorized'})
   @ApiInternalServerErrorResponse({description: 'Terjadi kesalahan dari server'})
   @ApiBadRequestResponse({ description: 'Data yang dimasukan tidak sesuai'})
