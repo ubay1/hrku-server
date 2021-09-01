@@ -6,12 +6,14 @@ import { User } from './entities/user.entity';
 import { Role } from 'src/role/entities/role.entity';
 import * as dotenv from 'dotenv'
 import { AuthModule } from 'src/auth/auth.module';
+import { BlacklistModule } from 'src/blacklist/blacklist.module';
 dotenv.config()
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([User, Role]),
     forwardRef(() => AuthModule),
+    forwardRef(() => BlacklistModule),
   ],
   controllers: [UserController],
   providers: [UserService],

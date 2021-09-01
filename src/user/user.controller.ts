@@ -9,13 +9,15 @@ import { AuthService } from 'src/auth/auth.service';
 import { LocalAuthGuard } from 'src/auth/guard/local-auth.guard';
 import { AuthLoginUserDto } from 'src/auth/dto/auth-login-user.dto';
 import { JwtAuthGuard } from 'src/auth/guard/jwt-auth.guard';
+import { BlacklistService } from 'src/blacklist/blacklist.service';
 
 @ApiTags('UserController')
 @Controller('user')
 export class UserController {
   constructor(
     private readonly userService: UserService,
-    private readonly authService: AuthService
+    private readonly authService: AuthService,
+    private readonly blacklistService: BlacklistService
   ) {}
 
   @UseGuards(JwtAuthGuard)
@@ -45,6 +47,20 @@ export class UserController {
   @ApiForbiddenResponse({ description: 'Gagal'})
   async login(@Request() req: any, @Body() dataUser: AuthLoginUserDto) {
     return this.authService.userLogin(req.user)
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('/logout')
+  @ApiBearerAuth('access-token')
+  @ApiOperation({summary: 'Logout User'})
+  @ApiOkResponse({description: 'Sukses'})
+  @ApiInternalServerErrorResponse({description: 'Terjadi kesalahan dari server'})
+  @ApiBadRequestResponse({ description: 'Data yang dimasukan tidak sesuai'})
+  @ApiForbiddenResponse({ description: 'Gagal'})
+  async logout(@Request() req: any,) {
+    const token = await req.headers.authorization.replace('Bearer ', '')
+    return this.blacklistService.logout(token)
+    // return saveTokenBlackList;
   }
 
   @UseGuards(JwtAuthGuard)
