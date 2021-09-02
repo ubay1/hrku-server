@@ -10,6 +10,7 @@ import { Role } from 'src/role/entities/role.entity';
 import * as jwt from 'jsonwebtoken';
 import { jwtConstants } from 'src/auth/constants/constant';
 import { decode } from 'punycode';
+import { UpdateFotoUserDto } from './dto/update-foto-user.dto';
 
 @Injectable()
 export class UserService {
@@ -99,6 +100,48 @@ export class UserService {
       return {message: 'data sukses diupdate'}
     } else {
       return {message: 'data gagal diupdate'}
+    }
+  }
+
+  async updateProfil(email: string, data: UpdateUserDto) {
+    const cekId = await this.findByEmail(email)
+    const cekPhone = await this.userRepository.find({where: {phone: data.phone}})
+
+    if (cekPhone.length !== 0) {
+      return {
+        statusCode: 403,
+        message: 'nomor telepon telah digunakan user lain',
+      }
+    }
+
+    if(cekId.length !== 0) {
+      await this.userRepository.update({email}, data);
+      return {
+        statusCode: 201,
+        message: 'data sukses diupdate'
+      }
+    } else {
+      return {
+        statusCode: 500,
+        message: 'data gagal diupdate'
+      }
+    }
+  }
+
+  async updateFotoProfil(email: string, foto: UpdateFotoUserDto | any) {
+    console.log(email)
+    const cekId = await this.findByEmail(email)
+    if(cekId.length !== 0) {
+      await this.userRepository.update({email}, {foto: foto});
+      return {
+        statusCode: 201,
+        message: 'foto sukses diupdate'
+      }
+    } else {
+      return {
+        statusCode: 500,
+        message: 'foto gagal diupdate'
+      }
     }
   }
 

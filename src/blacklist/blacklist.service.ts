@@ -20,7 +20,7 @@ export class BlacklistService {
   }
 
   async logout(data: any) {
-    console.log(data)
+    // console.log(data)
     const token = await this.blacklistRepository.create({
       token: data
     })
