@@ -14,6 +14,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
 import { editFileName, imageFileFilter } from './validation/uploadFoto';
+import { UpdateFotoUserDto } from './dto/update-foto-user.dto';
 
 @ApiTags('UserController')
 @Controller('user')
@@ -103,49 +104,24 @@ export class UserController {
 
   @UseGuards(JwtAuthGuard)
   @Post('/updateFotoProfil')
-  @ApiConsumes('multipart/form-data')
-  @UseInterceptors(FileInterceptor('file', {
-    storage: diskStorage({
-      destination: './uploads',
-      filename: editFileName
-    }),
-    fileFilter: imageFileFilter
-  }))
-  @ApiBody({
-    schema: {
-      type: 'object',
-      properties: {
-        file: {
-          type: 'string',
-          format: 'binary',
-        },
-      },
-    },
-  })
   @ApiBearerAuth('access-token')
   @ApiOperation({summary: 'Update Foto Profil'})
   @ApiCreatedResponse({description: 'Sukses'})
   @ApiInternalServerErrorResponse({description: 'Terjadi kesalahan dari server'})
   @ApiBadRequestResponse({ description: 'Data yang dimasukan tidak sesuai'})
   @ApiForbiddenResponse({ description: 'Gagal'})
-  async updateFotoProfil(@UploadedFile() file: Express.Multer.File,@Req() req: any, @Res() res: any) {
+  async updateFotoProfil(@Body() data: UpdateFotoUserDto, @Req() req: any, @Res() res: any) {
     
-    if (file === undefined) {
+    if (data.foto === undefined) {
       return res.status(HttpStatus.FORBIDDEN).json({
         message: 'harap masukan gambarnya'
       });
     } else {
-      // const response = {
-      //   originalname: file.originalname,
-      //   filename: file.filename,
-      // };
       const token = await req.headers.authorization.replace('Bearer ', '')
       const decodedToken = await this.authService.decodeToken(token)
-      const a = await this.userService.updateFotoProfil(decodedToken.email, file.filename)
+      const a = await this.userService.updateFotoProfil(decodedToken.email, data.foto)
       // console.log(a)
-      return res.status(HttpStatus.CREATED).json({
-        message: 'gambar berhasil dikirim'
-      });
+      return res.status(HttpStatus.CREATED).json(a);
     }
   }
 

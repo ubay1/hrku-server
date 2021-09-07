@@ -11,6 +11,7 @@ import * as jwt from 'jsonwebtoken';
 import { jwtConstants } from 'src/auth/constants/constant';
 import { decode } from 'punycode';
 import { UpdateFotoUserDto } from './dto/update-foto-user.dto';
+import * as fs from "fs-extra";
 
 @Injectable()
 export class UserService {
@@ -129,18 +130,65 @@ export class UserService {
   }
 
   async updateFotoProfil(email: string, foto: UpdateFotoUserDto | any) {
-    console.log(email)
+    // console.log(email)
     const cekId = await this.findByEmail(email)
     if(cekId.length !== 0) {
-      await this.userRepository.update({email}, {foto: foto});
-      return {
-        statusCode: 201,
-        message: 'foto sukses diupdate'
+      const updatePicture = await this.changePicture(foto, email)
+      if (updatePicture.status === 400) {
+        return {
+          statusCode: 400,
+          message: 'gagal upload foto'
+        }
+      } else if (updatePicture.status === 403) {
+        return {
+          statusCode: 403,
+          message: 'File harus bertipe JPG/JPEG/PNG'
+        }
+      } else {
+        this.userRepository.update({email}, {foto: updatePicture.pict_name});
+        return {
+          statusCode: 201,
+          message: 'foto sukses diupdate'
+        }
       }
     } else {
       return {
         statusCode: 500,
         message: 'foto gagal diupdate'
+      }
+    }
+  }
+
+  async changePicture( base64: string, email: string): Promise<any> {
+    let pict_name: any;
+    pict_name = email;
+    let photo_file = "avatar_" + pict_name + ".png";
+    const rootDir = process.cwd();
+    let next_path = "/storage/avatar/";
+    let photo_path = photo_file;
+    let base64Image = base64.split(";base64,").pop();
+    let base64Type = base64.split(";base64,", 1).pop();
+    let location = rootDir + next_path + photo_file
+    if (base64Type === "data:image/jpeg" || base64Type === "data:image/jpg" || base64Type === "data:image/png") {
+      try {
+        fs.writeFile(location, base64Image, { encoding: "base64" }, function (err) {
+          console.log("File created");
+        });
+        return {
+          statusCode: 200,
+          message: "file created",
+          pict_name: photo_file
+        }
+      } catch (error) {
+        return {
+          statusCode: 400,
+          message: "Failed Create File"
+        }
+      }
+    } else {
+      return {
+        status: 403,
+        message: "Not Base64"
       }
     }
   }
