@@ -80,7 +80,7 @@ export class UserService {
     const user = await this.userRepository.createQueryBuilder('user')
     .where("user.email = :email",{email: token.email})
     .leftJoinAndSelect("user.role", "role")
-    .select(['user.fullname', 'user.address', 'user.phone', 'user.foto', 'user.gender', 'user.email', 'role.role_name', 'role.slug_role_name'])
+    .select(['user.fullname', 'user.address', 'user.phone', 'user.foto', 'user.gender', 'user.email', 'user.no_rekening', 'user.no_bpjs', 'role.id', 'role.role_name', 'role.slug_role_name'])
     .getOne();
     return user;
   }
@@ -106,8 +106,9 @@ export class UserService {
 
   async updateProfil(email: string, data: UpdateUserDto) {
     const cekId = await this.findByEmail(email)
-    const cekPhone = await this.userRepository.find({where: {phone: data.phone}})
-
+    const cekPhone = await this.userRepository.find({where: {phone: data.phone, email: !email}})
+    console.log(cekPhone)
+    
     if (cekPhone.length !== 0) {
       return {
         statusCode: 403,

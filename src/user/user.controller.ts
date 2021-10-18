@@ -13,7 +13,6 @@ import { BlacklistService } from 'src/blacklist/blacklist.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
-import { editFileName, imageFileFilter } from './validation/uploadFoto';
 import { UpdateFotoUserDto } from './dto/update-foto-user.dto';
 
 @ApiTags('UserController')
@@ -97,7 +96,7 @@ export class UserController {
     const decodedToken = this.authService.decodeToken(token)
     const user = await this.userService.getProfil(decodedToken);
     return {
-      message: 'sukses mendapatkan data semua user',
+      message: 'sukses mendapatkan data user',
       data: user
     };
   }
