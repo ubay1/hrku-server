@@ -14,6 +14,8 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
 import { UpdateFotoUserDto } from './dto/update-foto-user.dto';
+import { ForgotPasswordUserDto } from './dto/forgot-password-user';
+import { OtpUserDto } from './dto/otp-user';
 
 @ApiTags('UserController')
 @Controller('user')
@@ -21,7 +23,7 @@ export class UserController {
   constructor(
     private readonly userService: UserService,
     private readonly authService: AuthService,
-    private readonly blacklistService: BlacklistService
+    private readonly blacklistService: BlacklistService,
   ) {}
 
   @UseGuards(JwtAuthGuard)
@@ -140,10 +142,52 @@ export class UserController {
     console.log(user)
     if (typeof(user) === undefined || user.statusCode === 403) {
       return res.status(HttpStatus.FORBIDDEN).json(user);
-    } else if(user.statusCode === 500) {
+    } else if(user.statusCode === 540) {
       return res.status(HttpStatus.BAD_REQUEST).json(user);
+    } else if(user.statusCode === 540) {
+      return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json(user);
     } else {
       return res.status(HttpStatus.CREATED).json(user)
+    }
+  }
+
+  @Post('/forgotPassword')
+  @ApiOperation({ summary: 'Forgot Password' })
+  @ApiOkResponse({ description: 'Sukses' })
+  @ApiInternalServerErrorResponse({ description: 'Terjadi kesalahan dari server' })
+  @ApiBadRequestResponse({ description: 'Data yang dimasukan tidak sesuai' })
+  @ApiForbiddenResponse({ description: 'Gagal' })
+  async forgotPassword(@Body() data: ForgotPasswordUserDto, @Res() res: any) {
+    const user = await this.userService.forgotPassword(data);
+    // console.log(user)
+    if (typeof (user) === undefined || user.statusCode === 403) {
+      return res.status(HttpStatus.FORBIDDEN).json(user);
+    } else if (user.statusCode === 400) {
+      return res.status(HttpStatus.BAD_REQUEST).json(user);
+    } else if (user.statusCode === 500) {
+      return res.status(HttpStatus.BAD_REQUEST).json(user);
+    } else {
+      return res.status(HttpStatus.OK).json(user)
+    }
+  }
+
+  @Post('/verifOtp')
+  @ApiOperation({ summary: 'Verif OTP' })
+  @ApiOkResponse({ description: 'Sukses' })
+  @ApiInternalServerErrorResponse({ description: 'Terjadi kesalahan dari server' })
+  @ApiBadRequestResponse({ description: 'Data yang dimasukan tidak sesuai' })
+  @ApiForbiddenResponse({ description: 'Gagal' })
+  async verifOtp(@Body() data: OtpUserDto, @Res() res: any) {
+    const user = await this.userService.verifOtp(data);
+    // console.log(user)
+    if (typeof (user) === undefined || user.statusCode === 403) {
+      return res.status(HttpStatus.FORBIDDEN).json(user);
+    } else if (user.statusCode === 400) {
+      return res.status(HttpStatus.BAD_REQUEST).json(user);
+    } else if (user.statusCode === 500) {
+      return res.status(HttpStatus.BAD_REQUEST).json(user);
+    } else {
+      return res.status(HttpStatus.OK).json(user)
     }
   }
 

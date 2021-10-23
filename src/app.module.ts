@@ -7,6 +7,7 @@ import { BlacklistModule } from './blacklist/blacklist.module';
 import { LoggerMiddleware } from './logger.middleware';
 import { ServeStaticModule } from '@nestjs/serve-static/dist/serve-static.module';
 import { join } from 'path';
+import { MailModule } from './mail/mail.module';
 
 @Module({
   imports: [
@@ -14,7 +15,7 @@ import { join } from 'path';
       rootPath: join(__dirname, '..', 'uploads'),
       serveRoot: '/uploads'
     }),
-    TypeOrmModule.forRoot(), RoleModule, UserModule, AuthModule, BlacklistModule
+    TypeOrmModule.forRoot(), RoleModule, UserModule, AuthModule, BlacklistModule, MailModule
   ],
   controllers: [],
   providers: [],

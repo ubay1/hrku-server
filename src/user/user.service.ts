@@ -12,12 +12,25 @@ import { jwtConstants } from 'src/auth/constants/constant';
 import { decode } from 'punycode';
 import { UpdateFotoUserDto } from './dto/update-foto-user.dto';
 import * as fs from "fs-extra";
+import { ForgotPasswordUserDto } from './dto/forgot-password-user';
+import { MailService } from 'src/mail/mail.service';
+import * as moment from 'moment';
+import { createCipheriv, createDecipheriv, randomBytes, scrypt } from 'crypto';
+import { promisify } from 'util';
+import { OtpUserDto } from './dto/otp-user';
+
+
+const algorithm = 'aes-256-ctr'
+const iv = randomBytes(16);
+const secretKey = 'vOVH6sdmpNWjRRIqCc7rdxs01lwHzfr3';
+const password = 'llakcolnu';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(User) private userRepository: Repository<User>,
     @InjectRepository(Role) private roleRepository: Repository<Role>,
+    private readonly mailService: MailService
   ) {}
 
   async findByEmail(email: string): Promise<any> {
@@ -124,7 +137,7 @@ export class UserService {
       }
     } else {
       return {
-        statusCode: 500,
+        statusCode: 400,
         message: 'data gagal diupdate'
       }
     }
@@ -154,7 +167,7 @@ export class UserService {
       }
     } else {
       return {
-        statusCode: 500,
+        statusCode: 400,
         message: 'foto gagal diupdate'
       }
     }
@@ -202,5 +215,87 @@ export class UserService {
     } else {
       return {message:'data user tidak ditemukan'}
     }
+  }
+
+  async forgotPassword(data: ForgotPasswordUserDto) {
+    const dataUser = await this.findByEmail(data.email)
+    
+    if (dataUser.length !== 0) {
+      var randomFixedInteger = function (length: number) {
+        return Math.floor(Math.pow(10, length - 1) + Math.random() * (Math.pow(10, length) - Math.pow(10, length - 1) - 1));
+      }
+      
+      const dataToken = {
+        otp: randomFixedInteger(4).toString(),
+        exp: moment().add(5, 'seconds').format('YYYY-MM-DD HH:mm:ss')
+      }
+      
+
+      const cipher = createCipheriv(algorithm, secretKey, iv);
+      const encryptedText = Buffer.concat([
+        cipher.update(JSON.stringify(dataToken)),
+        cipher.final(),
+      ]);
+
+      const stringifyDataEncrypt = JSON.stringify({
+        iv: iv.toString('hex'),
+        content: encryptedText.toString('hex')
+      })
+
+        
+      // console.log(iv.toString('hex'))
+      // console.log(encryptedText.toString('hex'))
+        
+      await this.userRepository.update(dataUser.id, { reset_password_token: stringifyDataEncrypt});
+      await this.mailService.codeForgotpassword(dataUser, dataToken);
+
+      return {
+        statusCode: 200,
+        message: 'email sukses dikirim'
+      }
+    } else {
+      return {
+        statusCode: 400,
+        message: 'email gagal dikirim'
+      }
+    }
+  }
+
+  async verifOtp(data: OtpUserDto) {
+    const dataUser = await this.findByEmail(data.email)
+
+    if (dataUser.length !== 0) {
+      const chiperr = dataUser.reset_password_token
+  
+      const parse = JSON.parse(chiperr)
+
+      // console.log(parse)
+      
+      const decipher = createDecipheriv(algorithm, secretKey, Buffer.from(parse.iv.toString('hex'), 'hex'));
+      
+      const decrpyted = Buffer.concat([decipher.update(Buffer.from(parse.content.toString('hex'), 'hex')), decipher.final()]);
+      
+      const getParseDataReset = JSON.parse(decrpyted.toString())
+
+      if (data.otp !== getParseDataReset.otp) {
+        return {
+          statusCode: 400,
+          message: 'OTP yang anda masukan tidak sesuai'
+        }
+      }
+
+      if (moment(getParseDataReset.exp).format('YYYY-MM-DD HH:mm:ss') < moment().format('YYYY-MM-DD HH:mm:ss')) {
+        return {
+          statusCode: 400,
+          message: 'otp telah kadaluarsa, silahkan kirim ulang'
+        }
+      }
+      
+      return {
+        statusCode: 200,
+        message: 'verif sukses'
+      }
+    }
+    
   }
 }

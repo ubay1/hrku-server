@@ -7,6 +7,7 @@ import { Role } from 'src/role/entities/role.entity';
 import * as dotenv from 'dotenv'
 import { AuthModule } from 'src/auth/auth.module';
 import { BlacklistModule } from 'src/blacklist/blacklist.module';
+import { MailModule } from 'src/mail/mail.module';
 dotenv.config()
 
 @Module({
@@ -14,6 +15,7 @@ dotenv.config()
     TypeOrmModule.forFeature([User, Role]),
     forwardRef(() => AuthModule),
     forwardRef(() => BlacklistModule),
+    MailModule
   ],
   controllers: [UserController],
   providers: [UserService],

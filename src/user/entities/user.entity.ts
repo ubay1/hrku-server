@@ -35,6 +35,8 @@ export class User {
     foto: string;
     @Column({length: 1, nullable: true, type: 'char'})
     gender: string;
+    @Column({nullable: true})
+    reset_password_token: string;
 
     @Column({type: 'timestamptz',default: () => 'CURRENT_TIMESTAMP'})
     created_at: string
