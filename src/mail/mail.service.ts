@@ -11,7 +11,7 @@ export class MailService {
     await this.mailerService.sendMail({
       to: data.email,
       // from: '"Support Team" <support@example.com>', // override default from
-      subject: 'forgot password HRKU',
+      subject: `${dataReset.otp} adalah kode otp anda`,
       template: './forgotPassword', // `.hbs` extension is appended automatically
       context: { // ✏️ filling curly brackets with content
         name: data.fullname,

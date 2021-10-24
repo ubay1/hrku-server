@@ -20,7 +20,7 @@ import { join } from 'path';
         },
       },
       defaults: {
-        from: '"No Reply" <noreply@hrku.com>',
+        from: '"HRKU Team" <noreply@hrku.com>',
       },
       template: {
         dir: join(__dirname, 'templates'),
