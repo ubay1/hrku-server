@@ -18,6 +18,7 @@ import * as moment from 'moment';
 import { createCipheriv, createDecipheriv, randomBytes, scrypt } from 'crypto';
 import { promisify } from 'util';
 import { OtpUserDto } from './dto/otp-user';
+import { ResetPasswordUserDto } from './dto/reset-password-user';
 
 
 const algorithm = 'aes-256-ctr'
@@ -227,7 +228,7 @@ export class UserService {
       
       const dataToken = {
         otp: randomFixedInteger(4).toString(),
-        exp: moment().add(5, 'seconds').format('YYYY-MM-DD HH:mm:ss')
+        exp: moment().add(1, 'hours').format('YYYY-MM-DD HH:mm:ss')
       }
       
 
@@ -297,5 +298,19 @@ export class UserService {
       }
     }
     
+  }
+
+  async resetPassword(data: ResetPasswordUserDto) {
+    const dataUser = await this.findByEmail(data.email)
+
+    if (dataUser.length !== 0) {
+      const chiperr = dataUser.reset_password_token
+
+      return {
+        statusCode: 200,
+        message: 'verif sukses'
+      }
+    }
+
   }
 }

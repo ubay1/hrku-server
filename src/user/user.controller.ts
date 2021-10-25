@@ -16,6 +16,7 @@ import { extname } from 'path';
 import { UpdateFotoUserDto } from './dto/update-foto-user.dto';
 import { ForgotPasswordUserDto } from './dto/forgot-password-user';
 import { OtpUserDto } from './dto/otp-user';
+import { ResetPasswordUserDto } from './dto/reset-password-user';
 
 @ApiTags('UserController')
 @Controller('user')
@@ -179,6 +180,26 @@ export class UserController {
   @ApiForbiddenResponse({ description: 'Gagal' })
   async verifOtp(@Body() data: OtpUserDto, @Res() res: any) {
     const user = await this.userService.verifOtp(data);
+    // console.log(user)
+    if (typeof (user) === undefined || user.statusCode === 403) {
+      return res.status(HttpStatus.FORBIDDEN).json(user);
+    } else if (user.statusCode === 400) {
+      return res.status(HttpStatus.BAD_REQUEST).json(user);
+    } else if (user.statusCode === 500) {
+      return res.status(HttpStatus.BAD_REQUEST).json(user);
+    } else {
+      return res.status(HttpStatus.OK).json(user)
+    }
+  }
+
+  @Post('/resetPassword')
+  @ApiOperation({ summary: 'Reset Password' })
+  @ApiOkResponse({ description: 'Sukses' })
+  @ApiInternalServerErrorResponse({ description: 'Terjadi kesalahan dari server' })
+  @ApiBadRequestResponse({ description: 'Data yang dimasukan tidak sesuai' })
+  @ApiForbiddenResponse({ description: 'Gagal' })
+  async resetPassword(@Body() data: ResetPasswordUserDto, @Res() res: any) {
+    const user = await this.userService.resetPassword(data);
     // console.log(user)
     if (typeof (user) === undefined || user.statusCode === 403) {
       return res.status(HttpStatus.FORBIDDEN).json(user);
