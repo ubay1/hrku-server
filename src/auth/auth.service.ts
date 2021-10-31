@@ -14,6 +14,7 @@ export class AuthService {
 
   async validateUser(email: string, password: string): Promise<any> {
     const user = await this.userService.findByEmail(email)
+
     if(!user) {
       return null;
     }
@@ -29,6 +30,13 @@ export class AuthService {
 
   async userLogin(user: any) {
     const payload = { email: user.email, sub: user.id };
+    
+    if (user.role.slug_role_name !== 'hrd') {
+      return {
+        statusCode: 403,
+        message: 'anda tidak mendapatkan akses, anda bukan HRD'
+      }
+    }
     return {
       access_token: this.jwtService.sign(payload),
     };

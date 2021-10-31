@@ -19,6 +19,7 @@ import { createCipheriv, createDecipheriv, randomBytes, scrypt } from 'crypto';
 import { promisify } from 'util';
 import { OtpUserDto } from './dto/otp-user';
 import { ResetPasswordUserDto } from './dto/reset-password-user';
+import { CheckResetPasswordUserDto } from './dto/check-reset-password';
 
 
 const algorithm = 'aes-256-ctr'
@@ -220,6 +221,13 @@ export class UserService {
 
   async forgotPassword(data: ForgotPasswordUserDto) {
     const dataUser = await this.findByEmail(data.email)
+
+    if (dataUser.role.slug_role_name !== 'hrd') {
+      return {
+        statusCode: 403,
+        message: 'anda tidak mendapatkan akses, anda bukan HRD'
+      }
+    }
     
     if (dataUser.length !== 0) {
       var randomFixedInteger = function (length: number) {
@@ -227,7 +235,7 @@ export class UserService {
       }
       
       const dataToken = {
-        otp: randomFixedInteger(4).toString(),
+        otp: randomFixedInteger(6).toString(),
         exp: moment().add(1, 'hours').format('YYYY-MM-DD HH:mm:ss')
       }
       
@@ -287,7 +295,7 @@ export class UserService {
 
       if (moment(getParseDataReset.exp).format('YYYY-MM-DD HH:mm:ss') < moment().format('YYYY-MM-DD HH:mm:ss')) {
         return {
-          statusCode: 400,
+          statusCode: 403,
           message: 'otp telah kadaluarsa, silahkan kirim ulang'
         }
       }
@@ -304,11 +312,35 @@ export class UserService {
     const dataUser = await this.findByEmail(data.email)
 
     if (dataUser.length !== 0) {
-      const chiperr = dataUser.reset_password_token
-
+      const hashedPassword = await bcrypt.hash(data.new_password, 10);
+      await this.userRepository.update(dataUser.id, {password: hashedPassword, reset_password_token: null});
+      
       return {
         statusCode: 200,
-        message: 'verif sukses'
+        message: 'pasword berhasil diubah',
+      }
+    } else {
+      return {
+        statusCode: 400,
+        message: 'data user tidak ditemukan',
+      }
+    }
+
+  }
+
+  async checkResetPassword(data: CheckResetPasswordUserDto) {
+    const dataUser = await this.findByEmail(data.email)
+    
+    if (dataUser.reset_password_token !== null) {
+      return {
+        statusCode: 200,
+        message: 'reset password token masih aktif',
+        data: dataUser
+      }
+    } else {
+      return {
+        statusCode: 403,
+        message: 'reset password token sudah tidak aktif',
       }
     }
 
