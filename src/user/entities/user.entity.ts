@@ -37,6 +37,10 @@ export class User {
     gender: string;
     @Column({nullable: true})
     reset_password_token: string;
+    @Column({nullable: true})
+    refreshtoken:string;
+    @Column({type: 'timestamptz', nullable: true})
+    refreshtokenexpires:string;
 
     @Column({type: 'timestamptz',default: () => 'CURRENT_TIMESTAMP'})
     created_at: string

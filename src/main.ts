@@ -4,12 +4,14 @@ import { AppModule } from './app.module';
 import * as dotenv from 'dotenv';
 import * as express from 'express';
 import { join } from 'path';
+import * as cookieParser from 'cookie-parser'
 
 dotenv.config()
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
+  // app.use(cookieParser)
   
   const pathFile = process.cwd();
   

@@ -18,6 +18,7 @@ import { ForgotPasswordUserDto } from './dto/forgot-password-user';
 import { OtpUserDto } from './dto/otp-user';
 import { ResetPasswordUserDto } from './dto/reset-password-user';
 import { CheckResetPasswordUserDto } from './dto/check-reset-password';
+import { JwtRefreshAuthGuard } from 'src/auth/guard/jwt-refresh-auth.guard';
 
 @ApiTags('UserController')
 @Controller('user')
@@ -281,5 +282,11 @@ export class UserController {
   async remove(@Param('id') id: number) {
     const user = await this.userService.remove(id);
     return user;
+  }
+
+  @UseGuards(JwtRefreshAuthGuard)
+  @Post('/refreshtoken')
+  async refreshToken(@Request() req){
+    return await this.authService.userLogin(req.user);
   }
 }

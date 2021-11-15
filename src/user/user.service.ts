@@ -104,7 +104,7 @@ export class UserService {
     const user = await this.userRepository.createQueryBuilder('user')
     .where("user.id = :id",{id: id})
     .leftJoinAndSelect("user.role", "role")
-    .select(['user', 'role.role_name', 'role.slug_role_name'])
+    .select(['user', 'role.role_name', 'role.slug_role_name', 'refreshtoken','refreshtokenexpires'])
     .getMany();
     return user;
   }
@@ -344,5 +344,9 @@ export class UserService {
       }
     }
 
+  }
+
+  async saveorupdateRefreshToken( refreshToken:string, email:string, refreshtokenexpires: any){
+    await this.userRepository.update({email}, {refreshtoken:refreshToken, refreshtokenexpires: refreshtokenexpires});
   }
 }
