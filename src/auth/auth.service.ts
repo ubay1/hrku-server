@@ -52,7 +52,7 @@ export class AuthService {
 
   async generateRefreshToken(email):  Promise<string>{
     var refreshToken = uid(32);
-    var expirydate = moment().add(5, 'days').format('YYYY-MM-DD HH:mm:ss');
+    var expirydate = moment().add(14, 'days').format('YYYY-MM-DD HH:mm:ss');
     await this.userService.saveorupdateRefreshToken(refreshToken, email, expirydate);
     return refreshToken
   }
