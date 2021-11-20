@@ -284,6 +284,24 @@ export class UserController {
     return user;
   }
 
+  @UseGuards(JwtAuthGuard)
+  @Get('/cekToken')
+  @ApiBearerAuth('access-token')
+  @ApiOperation({summary: 'Cek Token'})
+  @ApiOkResponse({description: 'Sukses'})
+  @ApiInternalServerErrorResponse({description: 'Terjadi kesalahan dari server'})
+  @ApiBadRequestResponse({ description: 'Data yang dimasukan tidak sesuai'})
+  @ApiForbiddenResponse({ description: 'Gagal'})
+  async cekTokens(@Request() req: any,) {
+    const token = req.headers.authorization.replace('Bearer ', '')
+    console.log(token)
+    // const decodedToken = this.authService.decodeToken(token)
+    // console.log(decodedToken)
+    // return {
+    //   message: 'token belum kadaluarsa',
+    // };
+  }
+
   @UseGuards(JwtRefreshAuthGuard)
   @Post('/refreshtoken')
   async refreshToken(@Request() req){
