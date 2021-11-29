@@ -6,5 +6,6 @@
   "password": "buaran123",
   "database": "hrku",
   "entities": ["dist/**/*.entity{.ts,.js}"],
+  "migrations": ["dist/1638138440301-SEED_DATA.js"],
   "synchronize": true
 }
