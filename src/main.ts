@@ -27,11 +27,11 @@ async function bootstrap() {
   .setTitle('HRku API')
   .setDescription('hrku API description')
   .setVersion('0.1')
-  .addBearerAuth(
-    { type: 'http', scheme: 'bearer' }, 'access-token',
-  )
+  .addBasicAuth({type: 'http',scheme: 'basic'})
+  .addBearerAuth({ type: 'http', scheme: 'bearer' }, 'access-token')
   .addServer(process.env.DEV_API,'Dev API')
   .build();
+
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('/api-docs', app, document);
 

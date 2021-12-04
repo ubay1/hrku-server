@@ -1,8 +1,9 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, HttpStatus, Put, UseGuards } from '@nestjs/common';
 import { RoleService } from './role.service';
 import { CreateRoleDto } from './dto/create-role.dto';
-import { ApiBadRequestResponse, ApiBearerAuth, ApiCreatedResponse, ApiForbiddenResponse, ApiInternalServerErrorResponse, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiBadRequestResponse, ApiBasicAuth, ApiBearerAuth, ApiCreatedResponse, ApiForbiddenResponse, ApiInternalServerErrorResponse, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/auth/guard/jwt-auth.guard';
+import { BasicAuthGuard } from 'src/auth/guard/basic-auth.guard';
 
 @ApiTags('RoleController')
 @Controller('role')
@@ -27,7 +28,9 @@ export class RoleController {
     };
   }
 
+  @UseGuards(BasicAuthGuard)
   @Get()
+  @ApiBasicAuth()
   @ApiOperation({summary: 'Get All Role'})
   @ApiOkResponse({description: 'Sukses'})
   @ApiInternalServerErrorResponse({description: 'Terjadi kesalahan dari server'})

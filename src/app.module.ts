@@ -8,6 +8,7 @@ import { LoggerMiddleware } from './logger.middleware';
 import { ServeStaticModule } from '@nestjs/serve-static/dist/serve-static.module';
 import { join } from 'path';
 import { MailModule } from './mail/mail.module';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { MailModule } from './mail/mail.module';
       rootPath: join(__dirname, '..', 'uploads'),
       serveRoot: '/uploads'
     }),
+    ConfigModule.forRoot(),
     TypeOrmModule.forRoot(), RoleModule, UserModule, AuthModule, BlacklistModule, MailModule
   ],
   controllers: [],
