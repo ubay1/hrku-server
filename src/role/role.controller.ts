@@ -31,7 +31,7 @@ export class RoleController {
   @UseGuards(BasicAuthGuard)
   @Get()
   @ApiBasicAuth()
-  @ApiOperation({summary: 'Get All Role'})
+  @ApiOperation({summary: 'Get All Role (basic-auth)'})
   @ApiOkResponse({description: 'Sukses'})
   @ApiInternalServerErrorResponse({description: 'Terjadi kesalahan dari server'})
   @ApiBadRequestResponse({ description: 'Data yang dimasukan tidak sesuai'})
@@ -44,8 +44,10 @@ export class RoleController {
     };
   }
 
+  @UseGuards(BasicAuthGuard)
   @Get(':id')
-  @ApiOperation({summary: 'Get Role By ID'})
+  @ApiBasicAuth()
+  @ApiOperation({summary: 'Get Role By ID (basic-auth)'})
   @ApiOkResponse({description: 'Sukses'})
   @ApiInternalServerErrorResponse({description: 'Terjadi kesalahan dari server'})
   @ApiBadRequestResponse({ description: 'Data yang dimasukan tidak sesuai'})

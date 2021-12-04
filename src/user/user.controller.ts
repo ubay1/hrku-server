@@ -2,7 +2,7 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, Put, Res, HttpStatus
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { ApiBadRequestResponse, ApiBearerAuth, ApiBody, ApiConsumes, ApiCreatedResponse, ApiForbiddenResponse, ApiInternalServerErrorResponse, ApiOkResponse, ApiOperation, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
+import { ApiBadRequestResponse, ApiBasicAuth, ApiBearerAuth, ApiBody, ApiConsumes, ApiCreatedResponse, ApiForbiddenResponse, ApiInternalServerErrorResponse, ApiOkResponse, ApiOperation, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
 import { LoginUserDto } from './dto/login-user.dto';
 import * as bcrypt from 'bcrypt';
 import { AuthService } from 'src/auth/auth.service';
@@ -19,6 +19,8 @@ import { OtpUserDto } from './dto/otp-user';
 import { ResetPasswordUserDto } from './dto/reset-password-user';
 import { CheckResetPasswordUserDto } from './dto/check-reset-password';
 import { JwtRefreshAuthGuard } from 'src/auth/guard/jwt-refresh-auth.guard';
+import { BasicAuthGuard } from 'src/auth/guard/basic-auth.guard';
+import { RefreshTokenUserDto } from 'src/auth/dto/referesh-token.dto';
 
 @ApiTags('UserController')
 @Controller('user')
@@ -162,8 +164,10 @@ export class UserController {
     }
   }
 
+  @UseGuards(BasicAuthGuard)
   @Post('/forgotPassword')
-  @ApiOperation({ summary: 'Forgot Password' })
+  @ApiBasicAuth()
+  @ApiOperation({ summary: 'Forgot Password (basic-auth)' })
   @ApiOkResponse({ description: 'Sukses' })
   @ApiInternalServerErrorResponse({ description: 'Terjadi kesalahan dari server' })
   @ApiBadRequestResponse({ description: 'Data yang dimasukan tidak sesuai' })
@@ -182,8 +186,10 @@ export class UserController {
     }
   }
 
+  @UseGuards(BasicAuthGuard)
   @Post('/verifOtp')
-  @ApiOperation({ summary: 'Verif OTP' })
+  @ApiBasicAuth()
+  @ApiOperation({ summary: 'Verif OTP (basic-auth)' })
   @ApiOkResponse({ description: 'Sukses' })
   @ApiInternalServerErrorResponse({ description: 'Terjadi kesalahan dari server' })
   @ApiBadRequestResponse({ description: 'Data yang dimasukan tidak sesuai' })
@@ -202,8 +208,10 @@ export class UserController {
     }
   }
 
+  @UseGuards(BasicAuthGuard)
   @Post('/resetPassword')
-  @ApiOperation({ summary: 'Reset Password' })
+  @ApiBasicAuth()
+  @ApiOperation({ summary: 'Reset Password (basic-auth)' })
   @ApiOkResponse({ description: 'Sukses' })
   @ApiInternalServerErrorResponse({ description: 'Terjadi kesalahan dari server' })
   @ApiBadRequestResponse({ description: 'Data yang dimasukan tidak sesuai' })
@@ -222,8 +230,10 @@ export class UserController {
     }
   }
 
+  @UseGuards(BasicAuthGuard)
   @Post('/checkResetPassword')
-  @ApiOperation({ summary: 'Check Data Reset Password' })
+  @ApiBasicAuth()
+  @ApiOperation({ summary: 'Check Data Reset Password (basic-auth)' })
   @ApiOkResponse({ description: 'Sukses' })
   @ApiInternalServerErrorResponse({ description: 'Terjadi kesalahan dari server' })
   @ApiBadRequestResponse({ description: 'Data yang dimasukan tidak sesuai' })
@@ -304,7 +314,12 @@ export class UserController {
 
   @UseGuards(JwtRefreshAuthGuard)
   @Post('/refreshtoken')
-  async refreshToken(@Request() req){
+  @ApiOperation({summary: 'Refresh Token'})
+  @ApiCreatedResponse({description: 'Sukses'})
+  @ApiInternalServerErrorResponse({description: 'Terjadi kesalahan dari server'})
+  @ApiBadRequestResponse({ description: 'Data yang dimasukan tidak sesuai'})
+  @ApiForbiddenResponse({ description: 'Gagal'})
+  async refreshToken(@Request() req, @Body() data: RefreshTokenUserDto){
     return await this.authService.userLogin(req.user);
   }
 }
