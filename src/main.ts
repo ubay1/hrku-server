@@ -17,11 +17,12 @@ async function bootstrap() {
   
   app.use('/avatar', express.static(pathFile + "/storage/avatar"));
 
+  console.log(process.env.NODE_ENV)
   
   app.use(express.json({limit: '50mb'}));
   app.use(express.urlencoded({limit: '50mb', extended: true}));
 
-  app.setGlobalPrefix('api/v1');
+  app.setGlobalPrefix(process.env.API_PREFIX);
 
   const config = new DocumentBuilder()
   .setTitle('HRku API')
@@ -29,7 +30,7 @@ async function bootstrap() {
   .setVersion('0.1')
   .addBasicAuth({type: 'http',scheme: 'basic'})
   .addBearerAuth({ type: 'http', scheme: 'bearer' }, 'access-token')
-  .addServer(process.env.DEV_API,'Dev API')
+  .addServer(process.env.URL,'Dev API')
   .build();
 
   const document = SwaggerModule.createDocument(app, config);

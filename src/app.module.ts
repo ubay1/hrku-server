@@ -10,13 +10,17 @@ import { join } from 'path';
 import { MailModule } from './mail/mail.module';
 import { ConfigModule } from '@nestjs/config';
 
+const ENV = process.env.NODE_ENV; // manage env
+
 @Module({
   imports: [
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', 'uploads'),
       serveRoot: '/uploads'
     }),
-    ConfigModule.forRoot(),
+    ConfigModule.forRoot({
+      envFilePath: !ENV ? '.env.development' : `.env.${ENV}`
+    }),
     TypeOrmModule.forRoot(), RoleModule, UserModule, AuthModule, BlacklistModule, MailModule
   ],
   controllers: [],

@@ -1,4 +1,5 @@
-import {Entity, PrimaryGeneratedColumn, Column} from "typeorm";
+import { User } from "src/user/entities/user.entity";
+import {Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, OneToMany} from "typeorm";
 
 @Entity()
 export class Role {
@@ -17,4 +18,7 @@ export class Role {
 
     @Column({type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP', onUpdate: 'CURRENT_TIMESTAMP'})
     updated_at: string
+
+    // @OneToMany(() => User, user => user.role)
+    // public user: User;
 }

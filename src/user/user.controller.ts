@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Put, Res, HttpStatus, UseGuards, HttpException, Req, Request, UseInterceptors, UploadedFile, HttpCode } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Put, Res, HttpStatus, UseGuards, HttpException, Req, Request, UseInterceptors, UploadedFile, HttpCode, Query, DefaultValuePipe, ParseIntPipe } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -21,6 +21,9 @@ import { CheckResetPasswordUserDto } from './dto/check-reset-password';
 import { JwtRefreshAuthGuard } from 'src/auth/guard/jwt-refresh-auth.guard';
 import { BasicAuthGuard } from 'src/auth/guard/basic-auth.guard';
 import { RefreshTokenUserDto } from 'src/auth/dto/referesh-token.dto';
+import { Pagination } from 'nestjs-typeorm-paginate';
+import { User } from './entities/user.entity';
+import { ConfigService } from '@nestjs/config';
 
 @ApiTags('UserController')
 @Controller('user')
@@ -90,12 +93,23 @@ export class UserController {
   @ApiInternalServerErrorResponse({description: 'Terjadi kesalahan dari server'})
   @ApiBadRequestResponse({ description: 'Data yang dimasukan tidak sesuai'})
   @ApiForbiddenResponse({ description: 'Gagal'})
-  async findAll() {
-    const user = await this.userService.findAll();
+  async findAll(
+    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number = 1,
+    @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number = 10,
+  ): Promise<any> {
+    limit = limit > 100 ? 100 : limit;
+    const data = await this.userService.paginateFindAll(
+      {
+        page,
+        limit,
+        route: process.env.URL+process.env.API_PREFIX,
+      }
+    );
+
     return {
-      message: 'sukses mendapatkan data semua user',
-      data: user
-    };
+      message: 'sukses mendapatkan data user',
+      data: data
+    }
   }
 
   @UseGuards(JwtAuthGuard)
@@ -167,7 +181,7 @@ export class UserController {
   @UseGuards(BasicAuthGuard)
   @Post('/forgotPassword')
   @ApiBasicAuth()
-  @ApiOperation({ summary: 'Forgot Password (basic-auth)' })
+  @ApiOperation({ summary: 'Forgot Password with (basic-auth)' })
   @ApiOkResponse({ description: 'Sukses' })
   @ApiInternalServerErrorResponse({ description: 'Terjadi kesalahan dari server' })
   @ApiBadRequestResponse({ description: 'Data yang dimasukan tidak sesuai' })
@@ -189,7 +203,7 @@ export class UserController {
   @UseGuards(BasicAuthGuard)
   @Post('/verifOtp')
   @ApiBasicAuth()
-  @ApiOperation({ summary: 'Verif OTP (basic-auth)' })
+  @ApiOperation({ summary: 'Verif OTP with (basic-auth)' })
   @ApiOkResponse({ description: 'Sukses' })
   @ApiInternalServerErrorResponse({ description: 'Terjadi kesalahan dari server' })
   @ApiBadRequestResponse({ description: 'Data yang dimasukan tidak sesuai' })
@@ -211,7 +225,7 @@ export class UserController {
   @UseGuards(BasicAuthGuard)
   @Post('/resetPassword')
   @ApiBasicAuth()
-  @ApiOperation({ summary: 'Reset Password (basic-auth)' })
+  @ApiOperation({ summary: 'Reset Password with (basic-auth)' })
   @ApiOkResponse({ description: 'Sukses' })
   @ApiInternalServerErrorResponse({ description: 'Terjadi kesalahan dari server' })
   @ApiBadRequestResponse({ description: 'Data yang dimasukan tidak sesuai' })
@@ -233,7 +247,7 @@ export class UserController {
   @UseGuards(BasicAuthGuard)
   @Post('/checkResetPassword')
   @ApiBasicAuth()
-  @ApiOperation({ summary: 'Check Data Reset Password (basic-auth)' })
+  @ApiOperation({ summary: 'Check Data Reset Password with (basic-auth)' })
   @ApiOkResponse({ description: 'Sukses' })
   @ApiInternalServerErrorResponse({ description: 'Terjadi kesalahan dari server' })
   @ApiBadRequestResponse({ description: 'Data yang dimasukan tidak sesuai' })

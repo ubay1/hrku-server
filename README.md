@@ -5,6 +5,7 @@
 $ npm install
 $ npm run start:dev
 $ npx typeorm migration:run ---> untuk menambahkan 1 data user
+$ npx typeorm migration:revert ---> untuk rollback seluruh data yang ter seeder diawal
 ```
 
 ## Running the app

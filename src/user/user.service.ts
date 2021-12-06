@@ -20,6 +20,11 @@ import { promisify } from 'util';
 import { OtpUserDto } from './dto/otp-user';
 import { ResetPasswordUserDto } from './dto/reset-password-user';
 import { CheckResetPasswordUserDto } from './dto/check-reset-password';
+import {
+  paginate,
+  Pagination,
+  IPaginationOptions,
+} from 'nestjs-typeorm-paginate';
 
 
 const algorithm = 'aes-256-ctr'
@@ -87,6 +92,14 @@ export class UserService {
     .select(['user', 'role.role_name', 'role.slug_role_name'])
     .getMany();
     return allUser;
+  }
+
+  async paginateFindAll(options: IPaginationOptions): Promise<Pagination<User>> {
+    const allUser = await this.userRepository.createQueryBuilder('user')
+    .leftJoinAndSelect("user.role", "role")
+    .select(['user', 'role.role_name', 'role.slug_role_name'])
+
+    return paginate<User>(allUser, options);
   }
 
   async getProfil(data: any) {
