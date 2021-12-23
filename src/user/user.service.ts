@@ -1,22 +1,17 @@
-import { HttpCode, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './entities/user.entity';
 import * as bcrypt from 'bcrypt';
-import { LoginUserDto } from './dto/login-user.dto';
 import { Role } from 'src/role/entities/role.entity';
-import * as jwt from 'jsonwebtoken';
-import { jwtConstants } from 'src/auth/constants/constant';
-import { decode } from 'punycode';
 import { UpdateFotoUserDto } from './dto/update-foto-user.dto';
 import * as fs from "fs-extra";
 import { ForgotPasswordUserDto } from './dto/forgot-password-user';
 import { MailService } from 'src/mail/mail.service';
 import * as moment from 'moment';
-import { createCipheriv, createDecipheriv, randomBytes, scrypt } from 'crypto';
-import { promisify } from 'util';
+import { createCipheriv, createDecipheriv, randomBytes } from 'crypto';
 import { OtpUserDto } from './dto/otp-user';
 import { ResetPasswordUserDto } from './dto/reset-password-user';
 import { CheckResetPasswordUserDto } from './dto/check-reset-password';
@@ -98,6 +93,7 @@ export class UserService {
     const allUser = await this.userRepository.createQueryBuilder('user')
     .leftJoinAndSelect("user.role", "role")
     .select(['user', 'role.role_name', 'role.slug_role_name'])
+    .where("user.roleId != :id", {id: 5})
 
     return paginate<User>(allUser, options);
   }

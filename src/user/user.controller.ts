@@ -1,18 +1,13 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Put, Res, HttpStatus, UseGuards, HttpException, Req, Request, UseInterceptors, UploadedFile, HttpCode, Query, DefaultValuePipe, ParseIntPipe } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Delete, Put, Res, HttpStatus, UseGuards, Req, Request, Query, DefaultValuePipe, ParseIntPipe } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { ApiBadRequestResponse, ApiBasicAuth, ApiBearerAuth, ApiBody, ApiConsumes, ApiCreatedResponse, ApiForbiddenResponse, ApiInternalServerErrorResponse, ApiOkResponse, ApiOperation, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
-import { LoginUserDto } from './dto/login-user.dto';
-import * as bcrypt from 'bcrypt';
+import { ApiBadRequestResponse, ApiBasicAuth, ApiBearerAuth, ApiCreatedResponse, ApiForbiddenResponse, ApiInternalServerErrorResponse, ApiOkResponse, ApiOperation, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
 import { AuthService } from 'src/auth/auth.service';
 import { LocalAuthGuard } from 'src/auth/guard/local-auth.guard';
 import { AuthLoginUserDto } from 'src/auth/dto/auth-login-user.dto';
 import { JwtAuthGuard } from 'src/auth/guard/jwt-auth.guard';
 import { BlacklistService } from 'src/blacklist/blacklist.service';
-import { FileInterceptor } from '@nestjs/platform-express';
-import { diskStorage } from 'multer';
-import { extname } from 'path';
 import { UpdateFotoUserDto } from './dto/update-foto-user.dto';
 import { ForgotPasswordUserDto } from './dto/forgot-password-user';
 import { OtpUserDto } from './dto/otp-user';
@@ -21,9 +16,6 @@ import { CheckResetPasswordUserDto } from './dto/check-reset-password';
 import { JwtRefreshAuthGuard } from 'src/auth/guard/jwt-refresh-auth.guard';
 import { BasicAuthGuard } from 'src/auth/guard/basic-auth.guard';
 import { RefreshTokenUserDto } from 'src/auth/dto/referesh-token.dto';
-import { Pagination } from 'nestjs-typeorm-paginate';
-import { User } from './entities/user.entity';
-import { ConfigService } from '@nestjs/config';
 
 @ApiTags('UserController')
 @Controller('user')
